@@ -213,6 +213,3 @@ install(PROGRAMS scripts/gripper_control_digital.pyc
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 ) 
 
-install(PROGRAMS scripts/gripper_control_digital.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
