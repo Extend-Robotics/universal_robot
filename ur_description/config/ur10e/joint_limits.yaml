@@ -58,6 +58,9 @@ joint_limits:
     max_position: !degrees  170.0
     max_velocity: !degrees  120.0
     min_position: !degrees -170.0
+    # max_position: !degrees  80.0
+    # max_velocity: !degrees  120.0
+    # min_position: !degrees -260.0
   wrist_2:
     # acceleration limits are not publicly available
     has_acceleration_limits: false
@@ -67,7 +70,7 @@ joint_limits:
     max_effort: 56.0
     max_position: !degrees  170.0
     max_velocity: !degrees  120.0
-    min_position: !degrees -170.0
+    min_position: !degrees  30
   wrist_3:
     # acceleration limits are not publicly available
     has_acceleration_limits: false
