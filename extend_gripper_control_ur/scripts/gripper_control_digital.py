@@ -12,7 +12,7 @@ import ur_msgs.srv
 
 #Creating the ros node and service client
 rospy.init_node("ur_gripper")
-rospy.wait_for_service("/ur_hardware_interface/set_io")
+rospy.wait_for_service("ur_hardware_interface/set_io")
 
 def dataCallback(msg):
     if(msg.gripperDigital.data):
@@ -20,7 +20,7 @@ def dataCallback(msg):
     else:
         gripperValue = 0
     gripperPin = msg.gripperPin.data
-    gripperControl = rospy.ServiceProxy("/ur_hardware_interface/set_io", ur_msgs.srv.SetIO)
+    gripperControl = rospy.ServiceProxy("ur_hardware_interface/set_io", ur_msgs.srv.SetIO)
     gripperAction = gripperControl(1,gripperPin,gripperValue)
     
 if __name__ == '__main__': 
