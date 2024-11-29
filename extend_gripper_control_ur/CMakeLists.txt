@@ -216,15 +216,15 @@ if( $ENV{ROS_PYTHON_VERSION} STREQUAL "2")
 endif()
 
 add_custom_command(
-  OUTPUT "scripts/gripper_control_digital.pyc"
-  DEPENDS "scripts/gripper_control_digital.py"
+  OUTPUT "scripts/gripper_control_digital.pyc" "scripts/gripper_control_robotiq.pyc"
+  DEPENDS "scripts/gripper_control_digital.py" "scripts/gripper_control_robotiq.py"
   COMMAND ${PYTHON_COMPILE_ALL} scripts
-  COMMAND chmod +x "scripts/gripper_control_digital.pyc"
+  COMMAND chmod +x "scripts/gripper_control_digital.pyc" "scripts/gripper_control_robotiq.pyc"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   COMMENT "Compiling python scripts"
 )
 
-add_custom_target(${PROJECT_NAME}_compiled_python ALL DEPENDS "scripts/gripper_control_digital.pyc")
+add_custom_target(${PROJECT_NAME}_compiled_python ALL DEPENDS "scripts/gripper_control_digital.pyc" "scripts/gripper_control_robotiq.pyc")
 
 
 
