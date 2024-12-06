@@ -9,6 +9,7 @@ import extend_msgs
 from extend_msgs.msg import GripperControl
 from std_msgs.msg import String
 from robotiq_2f_gripper_control.msg import Robotiq2FGripper_robot_output
+import time
 
 #Creating the ros node and service client
 rospy.init_node("ur_robotiq_gripper")
@@ -28,10 +29,12 @@ def dataCallback(msg):
 
 if __name__ == '__main__':
     pubRobotiqControl = initialize()
+    time.sleep(0.5)
     #Reset the Gripper
     gripperControlMsg = Robotiq2FGripper_robot_output()
     pubRobotiqControl.publish(gripperControlMsg)
 
+    time.sleep(1)
     #Activate the Gripper
     gripperControlMsg.rACT = 1
     gripperControlMsg.rGTO = 1
