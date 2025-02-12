@@ -6,8 +6,8 @@ import sys
 import copy
 import rospkg
 import extend_msgs
-from extend_msgs.msg import GripperControl
-from std_msgs.msg import String
+from extend_msgs.msg import GripperControl, GripperResponse
+from std_msgs.msg import Header
 from robotiq_2f_gripper_control.msg import Robotiq2FGripper_robot_output
 import time
 
@@ -15,8 +15,10 @@ import time
 rospy.init_node("ur_robotiq_gripper")
 
 def initialize():
-    pubRobotiqControl = rospy.Publisher('Robotiq2FGripperRobotOutput',Robotiq2FGripper_robot_output,queue_size=0)
-    return pubRobotiqControl
+    pubRobotiqControl = rospy.Publisher('Robotiq2FGripperRobotOutput',Robotiq2FGripper_robot_output,queue_size=1)
+    pubGripperCommandRepublisher = rospy.Publisher('extend_gripper_republished_command',GripperControl,queue_size=1)
+    pubGripperResponse = rospy.Publisher('extend_gripper_response',GripperResponse,queue_size=1)
+    return pubRobotiqControl,pubGripperCommandRepublisher,pubGripperResponse
 
 def dataCallback(msg):
     gripperControlMsg = Robotiq2FGripper_robot_output()
@@ -27,8 +29,23 @@ def dataCallback(msg):
     gripperControlMsg.rPR = int(255 * msg.gripperAnalog.data)
     pubRobotiqControl.publish(gripperControlMsg)
 
+    header = Header()
+    header.seq = 0
+    header.frame_id = ""
+    header.stamp = rospy.Time.now()
+
+    pubGripperCommandRepublisherData = GripperControl()
+    pubGripperCommandRepublisherData = msg
+    pubGripperCommandRepublisherData.header = header
+    pubGripperCommandRepublisher.publish(pubGripperCommandRepublisherData)
+
+    #Fetching the Gripper Response Joint States and Force
+    pubGripperResponseData = GripperResponse()
+    pubGripperResponseData.header = header
+    pubGripperResponse.publish(pubGripperResponseData)
+
 if __name__ == '__main__':
-    pubRobotiqControl = initialize()
+    (pubRobotiqControl,pubGripperCommandRepublisher,pubGripperResponse) = initialize()
     time.sleep(0.5)
     #Reset the Gripper
     gripperControlMsg = Robotiq2FGripper_robot_output()
