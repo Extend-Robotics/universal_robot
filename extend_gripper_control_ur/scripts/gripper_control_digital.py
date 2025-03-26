@@ -9,10 +9,9 @@ import extend_msgs
 from extend_msgs.msg import GripperControl, GripperResponse
 from std_msgs.msg import Header
 import ur_msgs.srv
+import os
 
-#Creating the ros node and service client
-rospy.init_node("ur_gripper")
-rospy.wait_for_service("ur_hardware_interface/set_io")
+
 
 def initialize():
     #Initialize the Modbus service and the response publisher
@@ -26,7 +25,7 @@ def dataCallback(msg):
     else:
         gripperValue = 0
     gripperPin = msg.gripperPin.data
-    gripperControl = rospy.ServiceProxy("ur_hardware_interface/set_io", ur_msgs.srv.SetIO)
+    gripperControl = rospy.ServiceProxy(setIOServiceName, ur_msgs.srv.SetIO)
     gripperAction = gripperControl(1,gripperPin,gripperValue)
     header = Header()
     header.seq = 0
@@ -45,7 +44,13 @@ def dataCallback(msg):
 
     
 if __name__ == '__main__': 
-    #Subscribe to Digital Gripper Data Stream from Unity  
+    #Creating the ros node and service client
+    rospy.init_node("ur_gripper")
+    setIOServiceName = os.environ['ROS_NAMESPACE']  + "/ur_hardware_interface/set_io"
+
+    rospy.wait_for_service(setIOServiceName)
     (pubGripperCommandRepublisher,pubGripperResponse) = initialize()   
+
+    #Subscribe to Digital Gripper Data Stream from Unity  
     rospy.Subscriber("extend_gripper_command", GripperControl, dataCallback, queue_size=1)
     rospy.spin() 
