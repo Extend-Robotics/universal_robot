@@ -14,7 +14,7 @@ joint_limits:
     max_effort: 738.0
     max_position: !degrees  360.0
     max_velocity: !degrees  120.0
-    min_position: !degrees -170.0
+    min_position: !degrees -360.0
   shoulder_lift:
     # acceleration limits are not publicly available
     has_acceleration_limits: false
@@ -24,7 +24,7 @@ joint_limits:
     max_effort: 738.0
     max_position: !degrees  360.0
     max_velocity: !degrees  120.0
-    min_position: !degrees -170.0
+    min_position: !degrees -360.0
   elbow_joint:
     # acceleration limits are not publicly available
     has_acceleration_limits: false
@@ -42,9 +42,9 @@ joint_limits:
     #
     # Refer to https://github.com/ros-industrial/universal_robot/issues/265 for
     # more information.
-    max_position: !degrees  170.0
+    max_position: !degrees  180.0
     max_velocity: !degrees  150.0
-    min_position: !degrees  0.0
+    min_position: !degrees -180.0
   wrist_1:
     # acceleration limits are not publicly available
     has_acceleration_limits: false
@@ -54,7 +54,7 @@ joint_limits:
     max_effort: 107.0
     max_position: !degrees  360.0
     max_velocity: !degrees  210.0
-    min_position: !degrees -170.0
+    min_position: !degrees -360.0
   wrist_2:
     # acceleration limits are not publicly available
     has_acceleration_limits: false
@@ -64,7 +64,7 @@ joint_limits:
     max_effort: 107.0
     max_position: !degrees  360.0
     max_velocity: !degrees  210.0
-    min_position: !degrees  30
+    min_position: !degrees -360.0
   wrist_3:
     # acceleration limits are not publicly available
     has_acceleration_limits: false
@@ -74,4 +74,4 @@ joint_limits:
     max_effort: 107.0
     max_position: !degrees  360.0
     max_velocity: !degrees  210.0
-    min_position: !degrees -170.0
+    min_position: !degrees -360.0
