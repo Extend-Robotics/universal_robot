@@ -2,6 +2,17 @@
 Changelog for package universal_robots
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.0 (2025-05-13)
+------------------
+* Add support for UR15 (`#702 <https://github.com/ros-industrial/universal_robot/issues/702>`_)
+* Add License files to packages (`#695 <https://github.com/ros-industrial/universal_robot/issues/695>`_)
+* Contributors: Felix Exner
+
+1.4.0 (2025-03-31)
+------------------
+* Add moveit configs for ur7e and ur12e to metapackage (`#693 <https://github.com/ros-industrial/universal_robot/issues/693>`_)
+* Contributors: Felix Exner
+
 1.3.3 (2024-04-08)
 ------------------
 * UR30 description and meshes (`#674 <https://github.com/ros-industrial/universal_robot/issues/674>`_)

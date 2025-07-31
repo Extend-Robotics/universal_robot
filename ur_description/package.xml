@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ur_description</name>
-  <version>1.3.3</version>
+  <version>1.5.0</version>
   <description>
-      URDF description for Universal UR3(e), UR5(e), UR10(e), UR16e, UR20 and UR30 robots
+      URDF description for Universal UR3(e), UR5(e), UR7e, UR10(e), UR12e UR16e, UR15, UR20 and UR30 robots
   </description>
 
   <author>Wim Meeussen</author>
@@ -19,6 +19,7 @@
   
   <!-- The UR20 and UR30 meshes constitutes “Graphical Documentation” the use of which is subject to and governed by our “Terms and Conditions for use of Graphical Documentation”, which can be found here: https://www.universal-robots.com/legal/terms-and-conditions/terms_and_conditions_for_use_of_graphical_documentation.txt -->
   <license file="meshes/ur20/LICENSE.txt">Universal Robots A/S' Terms and Conditions for Use of Graphical Documentation</license>
+  <license file="meshes/ur15/LICENSE.txt">Universal Robots A/S' Terms and Conditions for Use of Graphical Documentation</license>
   <license file="meshes/ur30/LICENSE.txt">Universal Robots A/S' Terms and Conditions for Use of Graphical Documentation</license>
   <!--<license file="meshes/ur20/LICENSE.txt" source-files="meshes/ur20/*" type="freeform">Universal Robots A/S' Terms and Conditions for Use of Graphical Documentation</license>-->
 
