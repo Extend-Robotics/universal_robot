@@ -26,7 +26,7 @@ def dataCallback(msg):
     gripperControlMsg.rGTO = 1
     gripperControlMsg.rSP = 255
     gripperControlMsg.rFR = 150
-    gripperControlMsg.rPR = int(255 * msg.gripperAnalog.data)
+    gripperControlMsg.rPR = int(255 * msg.gripper_analog.data)
     pubRobotiqControl.publish(gripperControlMsg)
 
     header = Header()
