@@ -152,8 +152,12 @@ install(TARGETS
     ur5e_kin
     ur10_kin
     ur10e_kin
+    ur16e_kin
+    ur15_kin
+    ur20_kin
+    ur30_kin
     ur3_moveit_plugin
-    ur3_moveit_plugin
+    ur3e_moveit_plugin
     ur5_moveit_plugin
     ur5e_moveit_plugin
     ur10_moveit_plugin
