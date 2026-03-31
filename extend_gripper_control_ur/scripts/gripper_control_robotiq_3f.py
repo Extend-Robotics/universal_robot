@@ -10,6 +10,8 @@ from std_msgs.msg import Header
 from robotiq_3f_gripper_articulated_msgs.msg import Robotiq3FGripperRobotOutput
 
 from extend_msgs.msg import GripperControl, GripperResponse
+from extend_msgs.srv import GetString, GetStringResponse
+
 
 
 FINGER_FORCE = 150
@@ -22,13 +24,27 @@ class Robotiq3FGripperMode(Enum):
     SCISSOR = 3
 
 class Robotiq3FGripperControlNode:
-    def __init__(self, mode=Robotiq3FGripperMode.BASIC):
+    def __init__(self, mode):
         # Initializing the publishers
         self.pub_robotiq_control = rospy.Publisher('Robotiq3FGripperRobotOutput', Robotiq3FGripperRobotOutput, queue_size=1)
         self.pub_gripper_command_republisher = rospy.Publisher('extend_gripper_republished_command', GripperControl, queue_size=1)
         self.pub_gripper_response = rospy.Publisher('extend_gripper_response', GripperResponse, queue_size=1)
+        rospy.Service('robotiq_3f_current_mode', GetString, self.current_mode_provider)
         self.current_mode = mode
         self.joint_command_values = [0.0] * 3  # Assuming 3 joints for the gripper
+
+
+    def current_mode_provider(self, request):
+        response = GetStringResponse()
+        if self.current_mode == Robotiq3FGripperMode.BASIC:
+            response = "Basic"
+        elif self.current_mode == Robotiq3FGripperMode.PINCH:
+            response = "Pinch"
+        elif self.current_mode == Robotiq3FGripperMode.WIDE:
+            response = "Wide"
+        else:
+            response = "Scissor"
+        return response
 
 
     def reset_gripper(self):
@@ -49,10 +65,8 @@ class Robotiq3FGripperControlNode:
             gripper_control_msg.rMOD = 1
         elif mode == Robotiq3FGripperMode.WIDE:
             gripper_control_msg.rMOD = 2
-        elif mode == Robotiq3FGripperMode.SCISSOR:
-            gripper_control_msg.rMOD = 3
         else:
-            raise ValueError("Invalid gripper mode selected")
+            gripper_control_msg.rMOD = 3
         self.pub_robotiq_control.publish(gripper_control_msg)
 
     def gripper_command_publish(self):
@@ -95,13 +109,10 @@ class Robotiq3FGripperControlNode:
             gripper_control_msg.rPRB = int(255 * self.joint_command_values[1] /70.0)
             gripper_control_msg.rPRC = int(255 * self.joint_command_values[2] /70.0)
 
-        elif self.current_mode == Robotiq3FGripperMode.SCISSOR:
+        else:
             gripper_control_msg.rMOD = 3
             # Map analog input value 0-1 to 0-255 for scissor mode
             gripper_control_msg.rPRA = int(255 * self.joint_command_values[0] /70.0) # In scissor mode individual finger control is disabled.
-
-        else:
-            raise ValueError("Invalid gripper mode selected, cannot publish gripper command")
 
         self.pub_robotiq_control.publish(gripper_control_msg)
 
@@ -128,10 +139,12 @@ class Robotiq3FGripperControlNode:
 
 def main():
     gripper_mode = os.getenv("GRIPPER_MODE", "BASIC")
-
     # Creating the ros node
     rospy.init_node("ur_robotiq_gripper")
-    gripper_control_node = Robotiq3FGripperControlNode(mode=Robotiq3FGripperMode[gripper_mode.upper()])
+    try:
+        gripper_control_node = Robotiq3FGripperControlNode(mode=Robotiq3FGripperMode[gripper_mode.upper()])
+    except KeyError as e:
+        raise KeyError(f"Invalid gripper mode \"{gripper_mode}\" selected. Please select the correct gripper mode")
 
     time.sleep(0.5)
     # Reset the Gripper
