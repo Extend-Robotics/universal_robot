@@ -4,18 +4,14 @@ import time
 from enum import Enum
 
 import rospy
-
 from std_msgs.msg import Header
-
 from robotiq_3f_gripper_articulated_msgs.msg import Robotiq3FGripperRobotOutput
-
 from extend_msgs.msg import GripperControl, GripperResponse
 from extend_msgs.srv import GetString, GetStringResponse
 
-
-
 FINGER_FORCE = 150
 FINGER_SPEED = 255
+
 
 class Robotiq3FGripperMode(Enum):
     BASIC = 0
@@ -136,9 +132,10 @@ class Robotiq3FGripperControlNode:
         pub_gripper_response_data = GripperResponse()
         pub_gripper_response_data.header = header
         self.pub_gripper_response.publish(pub_gripper_response_data)
+        self.gripper_command_publish()
 
 def main():
-    gripper_mode = os.getenv("GRIPPER_MODE", "BASIC")
+    gripper_mode = os.getenv("gripperMode", "BASIC")
     # Creating the ros node
     rospy.init_node("ur_robotiq_gripper")
     try:
