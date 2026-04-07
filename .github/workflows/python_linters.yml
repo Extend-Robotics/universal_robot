@@ -1,0 +1,26 @@
+name: PythonLinters
+
+on: [push]
+
+jobs:
+  call-workflow-python-linters:
+    uses: Extend-Robotics/er_build_tools_internal/.github/workflows/python_linters.yml@main
+    with:
+      blacklist: |
+        universal_robots/
+        ur10_moveit_config/
+        ur10e_moveit_config/
+        ur12e_moveit_config/
+        ur15_moveit_config/
+        ur16e_moveit_config/
+        ur20_moveit_config/
+        ur30_moveit_config/
+        ur3_moveit_config/
+        ur3e_moveit_config/
+        ur5_moveit_config/
+        ur5e_moveit_config/
+        ur7e_moveit_config/
+        ur_description/
+        ur_gazebo/
+        ur_kinematics/
+
