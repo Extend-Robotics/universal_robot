@@ -14,18 +14,20 @@ ROBOTIQ_3F_GRIPPER_MODE_ENUM_DICT = {"BASIC": 0, "PINCH": 1, "WIDE": 2, "SCISSOR
 
 
 class Robotiq3FGripperControlNode:
+    NUM_ACTIVE_JOINTS = 3
+    FINGER_POSITION_REGISTER_MAX = 255
+    MAX_FINGER_ANGLE_DEGREES = 70.0
     def __init__(self, mode):
-        # Initializing the publishers
         self.robotiq_control_pub = rospy.Publisher('Robotiq3FGripperRobotOutput', Robotiq3FGripperRobotOutput, queue_size=1)
         self.gripper_command_republisher = rospy.Publisher('extend_gripper_republished_command', GripperControl, queue_size=1)
         self.gripper_response_pub = rospy.Publisher('extend_gripper_response', GripperResponse, queue_size=1)
         rospy.Service('robotiq_3f_current_mode', GetString, self.current_mode_provider)
         self.current_mode = mode
-        self.joint_command_values = [0.0] * 3  # 3 Active joints for the gripper
+        self.joint_command_values = [0.0] * self.NUM_ACTIVE_JOINTS
+        self.analog_command_value = 0.0
 
-    def current_mode_provider(self, request):
+    def current_mode_provider(self, _):
         response = GetStringResponse()
-        # Providing the current gripper mode string
         response.data = self.current_mode
         return response
 
@@ -67,32 +69,44 @@ class Robotiq3FGripperControlNode:
 
         gripper_control_msg.rMOD = ROBOTIQ_3F_GRIPPER_MODE_ENUM_DICT[self.current_mode]
 
-        # Joint command values are in the range of 0-70 degrees for the fingers
-        gripper_control_msg.rPRA = int(255 * self.joint_command_values[0] /70.0)
-        if ROBOTIQ_3F_GRIPPER_MODE_ENUM_DICT[self.current_mode] in (0, 2):
+        if self.current_mode in ("BASIC", "WIDE"):
+            # For BASIC and WIDE modes, joint command values are in the range of 0-70 degrees for the fingers
             gripper_control_msg.rICF = 1
-            gripper_control_msg.rPRB = int(255 * self.joint_command_values[1] / 70.0)
-            gripper_control_msg.rPRC = int(255 * self.joint_command_values[2] / 70.0)
-
+            gripper_control_msg.rPRA = int(self.FINGER_POSITION_REGISTER_MAX * self.joint_command_values[0] / self.MAX_FINGER_ANGLE_DEGREES)
+            gripper_control_msg.rPRB = int(self.FINGER_POSITION_REGISTER_MAX * self.joint_command_values[1] / self.MAX_FINGER_ANGLE_DEGREES)
+            gripper_control_msg.rPRC = int(self.FINGER_POSITION_REGISTER_MAX * self.joint_command_values[2] / self.MAX_FINGER_ANGLE_DEGREES)
+        else:
+            # For PINCH and SCISSOR modes, all fingers move together based on the analog value between 0-1
+            gripper_control_msg.rICF = 0
+            gripper_control_msg.rPRA = int(self.FINGER_POSITION_REGISTER_MAX * self.analog_command_value)
         self.robotiq_control_pub.publish(gripper_control_msg)
 
     def vr_gripper_command_callback(self, msg):
-        if len(msg.handJointValues) > 0 and len(msg.handJointValues) == 3:
-            self.joint_command_values = msg.handJointValues
+        if self.current_mode in ("PINCH", "SCISSOR"):
+            self.analog_command_value = msg.gripperAnalog.data
+            if not 0.0 <= self.analog_command_value <= 1.0:
+                raise ValueError("Gripper analog command value must be between 0 and 1 for PINCH and SCISSOR modes.")
         else:
-            raise ValueError("Invalid hand joint values received.")
+            if len(msg.handJointValues) == 3:
+                value_error = []
+                self.joint_command_values = msg.handJointValues
+                for i, value in enumerate(self.joint_command_values):
+                    if not 0.0 <= value <= self.MAX_FINGER_ANGLE_DEGREES:
+                        value_error.append((f"Joint Command {value} recieved for Index {i} is outside [{0.0}, {self.MAX_FINGER_ANGLE_DEGREES}]"))
+                if value_error:
+                    raise ValueError( "\n".join(value_error))
+            else:
+                raise ValueError("Invalid hand joint values received.")
 
         header = Header()
         header.seq = 0
         header.frame_id = ""
         header.stamp = rospy.Time.now()
 
-        gripper_command_republisher_data = GripperControl()
         gripper_command_republisher_data = msg
         gripper_command_republisher_data.header = header
         self.gripper_command_republisher.publish(gripper_command_republisher_data)
 
-        # Fetching the Gripper Response Joint States and Force
         gripper_response_data = GripperResponse()
         gripper_response_data.header = header
         self.gripper_response_pub.publish(gripper_response_data)
@@ -101,25 +115,20 @@ class Robotiq3FGripperControlNode:
 def main():
     gripper_mode = os.getenv("gripperMode", "BASIC").upper()
     if gripper_mode not in ROBOTIQ_3F_GRIPPER_MODE_ENUM_DICT:
-        raise ValueError(f"Invalid gripper mode \"{gripper_mode}\" selected. Please select the correct gripper mode")
+        raise ValueError(f"Invalid gripper mode \"{gripper_mode}\" selected. Valid modes are: {list(ROBOTIQ_3F_GRIPPER_MODE_ENUM_DICT.keys())}")
 
-    # Creating the ros node and class instance
     rospy.init_node("ur_robotiq_gripper")
     gripper_control_node = Robotiq3FGripperControlNode(mode=gripper_mode)
 
-    # Reset the Gripper
     gripper_control_node.reset_gripper()
     time.sleep(1)
 
-    # Activate the Gripper
     gripper_control_node.activate_gripper()
     time.sleep(0.5)
 
-    # Set the Gripper Mode
     gripper_control_node.mode_select()
     time.sleep(0.5)
 
-    # Subscribe to Digital Gripper Data Stream from Unity
     rospy.Subscriber("extend_gripper_command", GripperControl, gripper_control_node.vr_gripper_command_callback)
     rospy.spin()
 
