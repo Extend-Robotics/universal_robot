@@ -91,7 +91,7 @@ class Robotiq3FGripperControlNode:
             if not 0.0 <= self.analog_command_value <= 1.0:
                 raise ValueError("Gripper analog command value must be between 0 and 1 for PINCH and SCISSOR modes.")
         else:
-            if len(msg.handJointValues) == NUM_ACTIVE_JOINTS:
+            if len(msg.handJointValues) == self.NUM_ACTIVE_JOINTS:
                 value_error = []
                 self.joint_command_values = msg.handJointValues
                 for i, value in enumerate(self.joint_command_values):
