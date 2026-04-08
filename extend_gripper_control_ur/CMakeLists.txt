@@ -106,12 +106,12 @@ catkin_package(CATKIN_DEPENDS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
+# catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES extend_gripper_control
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
-)
+# )
 
 ###########
 ## Build ##
@@ -213,6 +213,6 @@ include_directories(
 catkin_install_python(PROGRAMS
                       scripts/gripper_control_digital.py
                       scripts/gripper_control_robotiq.py
+                      scripts/gripper_control_robotiq_3f.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-

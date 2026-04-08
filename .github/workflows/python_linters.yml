@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   call-workflow-python-linters:
-    uses: Extend-Robotics/er_build_tools_internal/.github/workflows/python_linters.yml@main
+    uses: Extend-Robotics/er_build_tools/.github/workflows/python_linters.yml@main
     with:
       blacklist: |
         universal_robots/
