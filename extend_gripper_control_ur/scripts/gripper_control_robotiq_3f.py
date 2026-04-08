@@ -34,6 +34,9 @@ class Robotiq3FGripperControlNode:
 
     def reset_gripper(self):
         gripper_control_msg = Robotiq3FGripperRobotOutput()
+        # rACT = 0 is the reset command for the Robotiq 3F gripper, resets it to its initial state.
+        # Making the assignmenent explicitly here for clarity, even though the default value of rACT is 0
+        gripper_control_msg.rACT = 0
         self.robotiq_control_pub.publish(gripper_control_msg)
 
     def activate_gripper(self):
@@ -88,12 +91,12 @@ class Robotiq3FGripperControlNode:
             if not 0.0 <= self.analog_command_value <= 1.0:
                 raise ValueError("Gripper analog command value must be between 0 and 1 for PINCH and SCISSOR modes.")
         else:
-            if len(msg.handJointValues) == 3:
+            if len(msg.handJointValues) == NUM_ACTIVE_JOINTS:
                 value_error = []
                 self.joint_command_values = msg.handJointValues
                 for i, value in enumerate(self.joint_command_values):
                     if not 0.0 <= value <= self.MAX_FINGER_ANGLE_DEGREES:
-                        value_error.append((f"Joint Command {value} recieved for Index {i} is outside [{0.0}, {self.MAX_FINGER_ANGLE_DEGREES}]"))
+                        value_error.append((f"Joint Command {value} recieved for Index {i} is outside [0.0, {self.MAX_FINGER_ANGLE_DEGREES}]"))
                 if value_error:
                     raise ValueError("\n".join(value_error))
             else:
@@ -108,6 +111,9 @@ class Robotiq3FGripperControlNode:
         gripper_command_republisher_data.header = header
         self.gripper_command_republisher.publish(gripper_command_republisher_data)
 
+        # Data collection always requires a response to be published, even if it's empty
+        # Data collection config is based on arm models and does not consider the attached gripper type.
+        # Therefore, till we distinguish between different grippers we need to publish the response.
         gripper_response_data = GripperResponse()
         gripper_response_data.header = header
         self.gripper_response_pub.publish(gripper_response_data)
