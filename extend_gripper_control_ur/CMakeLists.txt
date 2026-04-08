@@ -216,4 +216,3 @@ catkin_install_python(PROGRAMS
                       scripts/gripper_control_robotiq_3f.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
