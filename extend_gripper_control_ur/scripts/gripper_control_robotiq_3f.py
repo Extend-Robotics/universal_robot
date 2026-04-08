@@ -17,6 +17,7 @@ class Robotiq3FGripperControlNode:
     NUM_ACTIVE_JOINTS = 3
     FINGER_POSITION_REGISTER_MAX = 255
     MAX_FINGER_ANGLE_DEGREES = 70.0
+
     def __init__(self, mode):
         self.robotiq_control_pub = rospy.Publisher('Robotiq3FGripperRobotOutput', Robotiq3FGripperRobotOutput, queue_size=1)
         self.gripper_command_republisher = rospy.Publisher('extend_gripper_republished_command', GripperControl, queue_size=1)
@@ -94,7 +95,7 @@ class Robotiq3FGripperControlNode:
                     if not 0.0 <= value <= self.MAX_FINGER_ANGLE_DEGREES:
                         value_error.append((f"Joint Command {value} recieved for Index {i} is outside [{0.0}, {self.MAX_FINGER_ANGLE_DEGREES}]"))
                 if value_error:
-                    raise ValueError( "\n".join(value_error))
+                    raise ValueError("\n".join(value_error))
             else:
                 raise ValueError("Invalid hand joint values received.")
 
@@ -111,6 +112,7 @@ class Robotiq3FGripperControlNode:
         gripper_response_data.header = header
         self.gripper_response_pub.publish(gripper_response_data)
         self.gripper_command_publish()
+
 
 def main():
     gripper_mode = os.getenv("gripperMode", "BASIC").upper()
@@ -131,6 +133,7 @@ def main():
 
     rospy.Subscriber("extend_gripper_command", GripperControl, gripper_control_node.vr_gripper_command_callback)
     rospy.spin()
+
 
 if __name__ == '__main__':
     main()
