@@ -20,13 +20,13 @@ def initialize():
     return pubGripperCommandRepublisher,pubGripperResponse
 
 def dataCallback(msg):
-    if(msg.gripperDigital.data):
+    if(msg.gripper_digital.data):
         gripperValue = 1
     else:
         gripperValue = 0
-    gripperPin = msg.gripperPin.data
+    gripper_pin = msg.gripper_pin.data
     gripperControl = rospy.ServiceProxy(setIOServiceName, ur_msgs.srv.SetIO)
-    gripperAction = gripperControl(1,gripperPin,gripperValue)
+    gripperAction = gripperControl(1,gripper_pin,gripperValue)
     header = Header()
     header.seq = 0
     header.frame_id = ""
